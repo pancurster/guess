@@ -1,23 +1,22 @@
 -module(guess).
 -export([main/0]).
 
-check(Guess, Answer) when Guess ==Answer -> {true, "You Win!"};
-check(Guess, Answer) when Guess > Answer -> {false, "Smaller"};
-check(Guess, Answer) when Guess < Answer -> {false, "Bigger"}.
+guess(Answer) ->
+    case io:fread("Guess number I think of:", "~d") of
+        {_, [Guess]} when Guess ==Answer -> {true, "You Win!"};
+        {_, [Guess]} when Guess > Answer -> {false, "Smaller"};
+        {_, [Guess]} when Guess < Answer -> {false, "Bigger"}
+    end.
 
-guess() ->
-    {_, [Guess]} = io:fread("Guess number I think of:", "~d"),
-    Guess.
-
-loop(Iter, Answer, false) ->
-    {Result, InfoStr} = check(guess(), Answer),
+loop(false, Score, Answer) ->
+    {Result, InfoStr} = guess(Answer),
     io:format("~s~n", [InfoStr]),
-    loop(Iter + 1, Answer, Result);
-loop(Iter, _, true) ->
-    io:format("Score:~p", [Iter]),
+    loop(Result, Score + 1, Answer);
+loop(true, Score, _) ->
+    io:format("Score:~p~n", [Score]),
     halt().
 
 main() ->
     random:seed(erlang:timestamp()),
-    loop(0, random:uniform(100), false).
+    loop(false, 0, random:uniform(100)).
 
